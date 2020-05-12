@@ -19,11 +19,13 @@ from experii.ax import AxTuner
 
 torch.backends.cudnn.benchmark=True
 EXPERIMENT_NAME = "Hyperparameter Tuning"
-client = Client("http://78351a12.ngrok.io")
+
+# Set up ModelDB:
+client = Client("http://78351a12.ngrok.io") # supply your own ModelDB'S client details here (see VertaAI's notebooks)
 proj = client.set_project("My second ModelDB project")
 exp = client.set_experiment(EXPERIMENT_NAME)
 
-
+# Define model generating function:
 def model_fn(parameterization: Dict[str, Any]) -> nn.Module:
     model = Sequential(
         ConvolutionalLayer(in_channels=3, out_channels=16, kernel_size=3, activation=nn.ReLU),
@@ -40,7 +42,7 @@ def model_fn(parameterization: Dict[str, Any]) -> nn.Module:
 
     return model
 
-
+# Define evaluating function:
 def evaluate_fn(parameterization: Dict[str, Any], model: nn.Module, run: ExperimentRun) -> float:
     lr = parameterization["lr"]
     print("Evaluate at learning rate %f" % lr)

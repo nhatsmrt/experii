@@ -30,6 +30,7 @@ class AxTuner:
         )
 
         print(best_parameters)
+        return best_parameters
 
     def evaluate(self, parameterization: Dict[str, Any]) -> float:
         """
