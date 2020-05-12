@@ -163,11 +163,6 @@ def evaluate_fn(parameterization: Dict[str, Any], model: nn.Module, run: Experim
     val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=128, shuffle=False)
     print("Number of batches per epoch " + str(len(train_loader)))
 
-
-    # Set up model:
-
-    # Setting up ModelDB:
-
     optimizer = SGD(model.parameters(), weight_decay=0.0001, lr=lr, momentum=0.9)
     learner = SupervisedImageLearner(
         train_data=train_loader,
