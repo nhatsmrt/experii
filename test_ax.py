@@ -25,31 +25,9 @@ exp = client.set_experiment(EXPERIMENT_NAME)
 
 
 def model_fn(parameterization: Dict[str, Any]) -> nn.Module:
-    class SEResNeXtShakeShake(ResNeXtBlock):
-        def __init__(self, in_channels, reduction_ratio=16, cardinality=2, activation=nn.ReLU,
-                     normalization=nn.BatchNorm2d):
-            super(SEResNeXtShakeShake, self).__init__(
-                branches=nn.ModuleList(
-                    [
-                        nn.Sequential(
-                            ConvolutionalLayer(
-                                in_channels, in_channels // 4, kernel_size=1, padding=0,
-                                activation=activation, normalization=normalization
-                            ),
-                            ConvolutionalLayer(
-                                in_channels // 4, in_channels, kernel_size=3, padding=1,
-                                activation=activation, normalization=normalization
-                            ),
-                            SEBlock(in_channels, reduction_ratio)
-                        ) for _ in range(cardinality)
-                        ]
-                ),
-                use_shake_shake=True
-            )
-
     model = Sequential(
         ConvolutionalLayer(in_channels=3, out_channels=16, kernel_size=3, activation=nn.ReLU),
-        SEResNeXtShakeShake(in_channels=16, activation=nn.ReLU),
+        ResidualBlockPreActivation(in_channels=16, activation=nn.ReLU),
         FeedforwardBlock(
             in_channels=16,
             out_features=10,
