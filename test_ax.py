@@ -28,11 +28,13 @@ def model_fn(parameterization: Dict[str, Any]) -> nn.Module:
     model = Sequential(
         ConvolutionalLayer(in_channels=3, out_channels=16, kernel_size=3, activation=nn.ReLU),
         ResidualBlockPreActivation(in_channels=16, activation=nn.ReLU),
+        ConvolutionalLayer(in_channels=16, out_channels=32, kernel_size=3, activation=nn.ReLU),
+        ResidualBlockPreActivation(in_channels=32, activation=nn.ReLU),
         FeedforwardBlock(
-            in_channels=16,
+            in_channels=32,
             out_features=10,
             pool_output_size=2,
-            hidden_layer_sizes=(128, 64)
+            hidden_layer_sizes=(64, 32)
         )
     ).to(get_device())
 
@@ -83,7 +85,7 @@ def evaluate_fn(parameterization: Dict[str, Any], model: nn.Module, run: Experim
     ]
 
     return learner.learn(
-        n_epoch=2,
+        n_epoch=20,
         callbacks=callbacks,
         metrics=metrics,
         final_metric='accuracy'
