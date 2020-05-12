@@ -21,7 +21,7 @@ torch.backends.cudnn.benchmark=True
 EXPERIMENT_NAME = "Hyperparameter Tuning"
 
 # Set up ModelDB:
-client = Client("http://78351a12.ngrok.io") # supply your own ModelDB'S client details here (see VertaAI's notebooks)
+client = Client(CLIENT_PARA) # supply your own ModelDB'S client parameters here (see VertaAI's notebooks)
 proj = client.set_project("My second ModelDB project")
 exp = client.set_experiment(EXPERIMENT_NAME)
 
