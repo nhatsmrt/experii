@@ -30,9 +30,14 @@ class ModelDBCB(Callback):
         self.mode = mode
         self.save_best_only = save_best_only
 
-    # def on_train_begin(self):
-    #     # automatically log model's topology
-    #     self.learner._model.register_forward_hook(verta_hook(self.run))
+    def on_train_begin(self):
+        # automatically log model's topology
+        self.hook = self.learner._model.register_forward_hook(verta_hook(self.run))
+
+    def on_batch_end(self, logs: Dict[str, Any]):
+        if logs["iter_cnt"] == 0:
+            # Deregister verta hook to avoid slow downs:
+            self.hook.remove()
 
     def on_epoch_end(self, logs: Dict[str, Any]) -> bool:
         if self.save_best_only:
