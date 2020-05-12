@@ -19,7 +19,7 @@ class ModelDBCB(Callback):
             save_best_only: bool=True, mode: str='min', period: int=1
     ):
         super().__init__()
-        assert monitor in self.metrics
+        assert monitor in metrics
 
         self.order = 9999
         self.metrics = metrics
