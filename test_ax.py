@@ -106,17 +106,11 @@ def model_fn(parameterization: Dict[str, Any]) -> nn.Module:
     model = Sequential(
         ConvolutionalLayer(in_channels=3, out_channels=16, kernel_size=3, activation=nn.ReLU),
         SEResNeXtShakeShake(in_channels=16, activation=nn.ReLU),
-        ConvolutionalLayer(
-            in_channels=16, out_channels=32,
-            activation=nn.ReLU,
-            kernel_size=2, stride=2
-        ),
-        SEResNeXtShakeShake(in_channels=32),
         FeedforwardBlock(
-            in_channels=32,
+            in_channels=16,
             out_features=10,
             pool_output_size=2,
-            hidden_layer_sizes=(256, 128)
+            hidden_layer_sizes=(128, 64)
         )
     ).to(get_device())
 
