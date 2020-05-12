@@ -47,62 +47,6 @@ def model_fn(parameterization: Dict[str, Any]) -> nn.Module:
                 use_shake_shake=True
             )
 
-    class StandAloneMultiheadAttentionLayer(nn.Sequential):
-        def __init__(
-                self, num_heads, in_channels, out_channels, kernel_size, stride=1, padding=3,
-                activation=nn.ReLU, normalization=nn.BatchNorm2d
-        ):
-            layers = [
-                StandAloneMultiheadAttention(
-                    num_heads=num_heads,
-                    in_channels=in_channels,
-                    out_channels=out_channels,
-                    kernel_size=kernel_size,
-                    stride=stride,
-                    padding=padding,
-                    bias=False
-                ),
-                activation(),
-                normalization(num_features=out_channels),
-            ]
-            super(StandAloneMultiheadAttentionLayer, self).__init__(*layers)
-
-    class SEResNeXtShakeShakeAttention(ResNeXtBlock):
-        def __init__(self, num_heads, in_channels, reduction_ratio=16, cardinality=2, activation=nn.ReLU,
-                     normalization=nn.BatchNorm2d):
-            super(SEResNeXtShakeShakeAttention, self).__init__(
-                branches=nn.ModuleList(
-                    [
-                        nn.Sequential(
-                            ConvolutionalLayer(
-                                in_channels=in_channels,
-                                out_channels=in_channels // 2,
-                                kernel_size=1,
-                                activation=activation,
-                                normalization=normalization
-                            ),
-                            StandAloneMultiheadAttentionLayer(
-                                num_heads=num_heads,
-                                in_channels=in_channels // 2,
-                                out_channels=in_channels // 2,
-                                kernel_size=3,
-                                activation=activation,
-                                normalization=normalization
-                            ),
-                            ConvolutionalLayer(
-                                in_channels=in_channels // 2,
-                                out_channels=in_channels,
-                                kernel_size=1,
-                                activation=activation,
-                                normalization=normalization
-                            ),
-                            SEBlock(in_channels, reduction_ratio)
-                        ) for _ in range(cardinality)
-                        ]
-                ),
-                use_shake_shake=True
-            )
-
     model = Sequential(
         ConvolutionalLayer(in_channels=3, out_channels=16, kernel_size=3, activation=nn.ReLU),
         SEResNeXtShakeShake(in_channels=16, activation=nn.ReLU),
@@ -155,10 +99,8 @@ def evaluate_fn(parameterization: Dict[str, Any], model: nn.Module, run: Experim
 
     callbacks = [
         ToDeviceCallback(),
-        Tensorboard(),
         LRSchedulerCB(CosineAnnealingLR(optimizer, eta_min=0.024, T_max=405)),
-        GradualLRWarmup(min_lr=0.024, max_lr=0.094, duration=810),
-        LossLogger(),
+        LossLogger(print_every=1),
         ModelDBCB(run=run, metrics=metrics, monitor='accuracy', mode='max')
     ]
 
