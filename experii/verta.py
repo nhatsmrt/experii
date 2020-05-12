@@ -3,6 +3,7 @@ from nntoolbox.callbacks import Callback
 from nntoolbox.metrics import Metric
 from verta.integrations.torch import verta_hook
 from typing import Dict, Any
+from nntoolbox.utils import save_model
 
 
 __all__ = ['ModelDBCB']
@@ -15,7 +16,7 @@ class ModelDBCB(Callback):
     Log the model's architecture and final (best) validation metrics. Also checkpointing model by epoch.
     """
     def __init__(
-            self, run: ExperimentRun, metrics: Dict[str, Metric], monitor: str='loss',
+            self, run: ExperimentRun, filepath: str, metrics: Dict[str, Metric], monitor: str='loss',
             save_best_only: bool=True, mode: str='min', period: int=1
     ):
         super().__init__()
@@ -25,6 +26,7 @@ class ModelDBCB(Callback):
         self.metrics = metrics
         self.run = run
 
+        self.filepath = filepath
         self.monitor = monitor
         self.period = period
         self.mode = mode
@@ -46,12 +48,15 @@ class ModelDBCB(Callback):
 
             if self.mode == "min":
                 if epoch_metrics[self.monitor] <= best_so_far:
-                    self.run.log_artifact(key="weights_%d" % logs["epoch"], artifact=self.learner._model.state_dict())
+                    save_model(self._learner.model, self.filepath)
+                    self.run.log_artifact(key="weights", artifact=self.filepath, overwrite=True)
             else:
                 if epoch_metrics[self.monitor] >= best_so_far:
-                    self.run.log_artifact(key="weights_%d" % logs["epoch"], artifact=self.learner._model.state_dict())
+                    save_model(self._learner.model, self.filepath)
+                    self.run.log_artifact(key="weights", artifact=self.filepath, overwrite=True)
         else:
-            self.run.log_artifact(key="weights_%d" % logs["epoch"], artifact=self.learner._model.state_dict())
+            save_model(self._learner.model, self.filepath)
+            self.run.log_artifact(key="weights", artifact=self.filepath, overwrite=True)
 
         return False
 

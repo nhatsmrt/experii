@@ -79,7 +79,7 @@ def evaluate_fn(parameterization: Dict[str, Any], model: nn.Module, run: Experim
         ToDeviceCallback(),
         LRSchedulerCB(CosineAnnealingLR(optimizer, eta_min=0.024, T_max=405)),
         LossLogger(),
-        ModelDBCB(run=run, metrics=metrics, monitor='accuracy', mode='max')
+        ModelDBCB(run=run, filepath="weights/model.pt", metrics=metrics, monitor='accuracy', mode='max')
     ]
 
     return learner.learn(
