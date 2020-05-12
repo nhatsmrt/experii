@@ -21,6 +21,7 @@ torch.backends.cudnn.benchmark=True
 EXPERIMENT_NAME = "Hyperparameter Tuning"
 client = Client("http://78351a12.ngrok.io")
 proj = client.set_project("My second ModelDB project")
+exp = client.set_experiment(EXPERIMENT_NAME)
 
 
 def model_fn(parameterization: Dict[str, Any]) -> nn.Module:
