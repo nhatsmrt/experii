@@ -112,28 +112,8 @@ def model_fn(parameterization: Dict[str, Any]) -> nn.Module:
             kernel_size=2, stride=2
         ),
         SEResNeXtShakeShake(in_channels=32),
-        ConvolutionalLayer(
-            in_channels=32, out_channels=64,
-            kernel_size=2, stride=2
-        ),
-        SEResNeXtShakeShake(in_channels=64),
-        ConvolutionalLayer(
-            in_channels=64, out_channels=128,
-            kernel_size=2, stride=2
-        ),
-        SEResNeXtShakeShake(in_channels=128),
-        ConvolutionalLayer(
-            in_channels=128, out_channels=256,
-            kernel_size=2, stride=2
-        ),
-        SEResNeXtShakeShake(in_channels=256),
-        ConvolutionalLayer(
-            in_channels=256, out_channels=512,
-            kernel_size=2, stride=2
-        ),
-        SEResNeXtShakeShake(in_channels=512),
         FeedforwardBlock(
-            in_channels=512,
+            in_channels=32,
             out_features=10,
             pool_output_size=2,
             hidden_layer_sizes=(256, 128)
