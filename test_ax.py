@@ -184,8 +184,7 @@ def evaluate_fn(parameterization: Dict[str, Any], model: nn.Module, run: Experim
         LRSchedulerCB(CosineAnnealingLR(optimizer, eta_min=0.024, T_max=405)),
         GradualLRWarmup(min_lr=0.024, max_lr=0.094, duration=810),
         LossLogger(),
-        ModelCheckpoint(learner=learner, filepath="weights/model.pt", monitor='accuracy', mode='max'),
-        ModelDBCB(run=run, metrics=metrics),
+        ModelDBCB(run=run, metrics=metrics, monitor='accuracy', mode='max')
     ]
 
     return learner.learn(
