@@ -48,14 +48,14 @@ class ModelDBCB(Callback):
 
             if self.mode == "min":
                 if epoch_metrics[self.monitor] <= best_so_far:
-                    save_model(self.learner.model, self.filepath)
+                    save_model(self.learner._model, self.filepath)
                     self.run.log_artifact(key="weights", artifact=self.filepath, overwrite=True)
             else:
                 if epoch_metrics[self.monitor] >= best_so_far:
-                    save_model(self.learner.model, self.filepath)
+                    save_model(self.learner._model, self.filepath)
                     self.run.log_artifact(key="weights", artifact=self.filepath, overwrite=True)
         else:
-            save_model(self.learner.model, self.filepath)
+            save_model(self.learner._model, self.filepath)
             self.run.log_artifact(key="weights", artifact=self.filepath, overwrite=True)
 
         return False
