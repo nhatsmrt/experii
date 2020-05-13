@@ -61,8 +61,5 @@ class ModelDBCB(Callback):
         return False
 
     def on_train_end(self):
-        # Log the best value of metrics
-        final_metrics = {}
-        for key in self.metrics:
-            final_metrics[key] = self.metrics[key].get_best()
-        self.run.log_metrics(final_metrics)
+        # Log the best value of the monitor metric
+        self.run.log_metric(key=self.monitor, value=self.metrics[self.monitor].get_best())
