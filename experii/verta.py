@@ -17,7 +17,7 @@ class ModelDBCB(Callback):
     """
     def __init__(
             self, run: ExperimentRun, filepath: str, metrics: Dict[str, Metric], monitor: str='loss',
-            save_best_only: bool=True, mode: str='min', period: int=1
+            save_best_only: bool=True, upload_to_mdb_every_epoch: bool=False, mode: str='min', period: int=1
     ):
         super().__init__()
         assert monitor in metrics
@@ -31,6 +31,7 @@ class ModelDBCB(Callback):
         self.period = period
         self.mode = mode
         self.save_best_only = save_best_only
+        self.upload_to_mdb_every_epoch = upload_to_mdb_every_epoch
 
     def on_train_begin(self):
         # automatically log model's topology
@@ -49,17 +50,23 @@ class ModelDBCB(Callback):
             if self.mode == "min":
                 if epoch_metrics[self.monitor] <= best_so_far:
                     save_model(self.learner._model, self.filepath)
-                    self.run.log_artifact(key="weights", artifact=self.filepath, overwrite=True)
+
+                    if self.upload_to_mdb_every_epoch:
+                        self.run.log_artifact(key="weights", artifact=self.filepath, overwrite=True)
             else:
                 if epoch_metrics[self.monitor] >= best_so_far:
                     save_model(self.learner._model, self.filepath)
-                    self.run.log_artifact(key="weights", artifact=self.filepath, overwrite=True)
-        else:
+
+                    if self.upload_to_mdb_every_epoch:
+                        self.run.log_artifact(key="weights", artifact=self.filepath, overwrite=True)
+        elif self.upload_to_mdb_every_epoch:
             save_model(self.learner._model, self.filepath)
             self.run.log_artifact(key="weights", artifact=self.filepath, overwrite=True)
 
         return False
 
     def on_train_end(self):
+        self.run.log_artifact(key="weights", artifact=self.filepath, overwrite=True)
+
         # Log the best value of the monitor metric
         self.run.log_metric(key=self.monitor, value=self.metrics[self.monitor].get_best())
